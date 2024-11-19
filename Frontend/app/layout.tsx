@@ -5,6 +5,7 @@ import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 import Providers from "@/components/layout/providers";
 import { Toaster } from "@/components/ui/sonner";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,10 +36,12 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased`}
       >
         <NextTopLoader showSpinner={false} />
-        <Providers session={session}>
-          <Toaster />
-          {children}
-        </Providers>
+        <NuqsAdapter>
+          <Providers session={session}>
+            <Toaster />
+            {children}
+          </Providers>
+        </NuqsAdapter>
       </body>
     </html>
   );

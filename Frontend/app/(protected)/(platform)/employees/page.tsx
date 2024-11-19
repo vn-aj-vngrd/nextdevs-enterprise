@@ -1,18 +1,20 @@
+import { searchParamsCache } from "@/lib/search-params";
+import { type SearchParams } from "nuqs/server";
+import React from "react";
+import EmployeeListingPage from "./_components/employee-listing-page";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
+type PageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+export const metadat: Metadata = {
   title: "Employees | NextDevs Inc."
 };
 
-export default function Page() {
-  return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div className="aspect-video rounded-xl bg-muted/50" />
-        <div className="aspect-video rounded-xl bg-muted/50" />
-        <div className="aspect-video rounded-xl bg-muted/50" />
-      </div>
-      <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-    </div>
-  );
+export default async function Page({ searchParams }: PageProps) {
+  // Allow nested RSCs to access the search params (in a type-safe way)
+  await searchParamsCache.parse(searchParams);
+
+  return <EmployeeListingPage />;
 }
