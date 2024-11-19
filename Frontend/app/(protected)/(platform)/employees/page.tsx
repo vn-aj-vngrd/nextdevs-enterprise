@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 };
 
 export default async function Page({ searchParams }: PageProps) {
-  // Allow nested RSCs to access the search params (in a type-safe way)
   await searchParamsCache.parse(searchParams);
 
   return <EmployeeListingPage />;
