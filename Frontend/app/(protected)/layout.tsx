@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
-  title: "Dashboard | NextDevs Inc."
+  title: "NextDevs Inc."
 };
 
 export default async function DashboardLayout({
