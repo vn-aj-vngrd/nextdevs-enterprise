@@ -8,7 +8,7 @@ type PageProps = {
   searchParams: Promise<SearchParams>;
 };
 
-export const metadat: Metadata = {
+export const metadata: Metadata = {
   title: "Employees | NextDevs Inc."
 };
 
