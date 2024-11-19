@@ -5,11 +5,10 @@ namespace Backend.Domain.Products.DTOs
 {
     public class ProductDto
     {
-#pragma warning disable
         public ProductDto()
         {
         }
-#pragma warning restore
+
         public ProductDto(Product product)
         {
             Id = product.Id;

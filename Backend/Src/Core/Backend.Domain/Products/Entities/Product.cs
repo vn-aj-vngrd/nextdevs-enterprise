@@ -4,11 +4,10 @@ namespace Backend.Domain.Products.Entities
 {
     public class Product : AuditableBaseEntity
     {
-#pragma warning disable
         private Product()
         {
         }
-#pragma warning disable
+
         public Product(string name, double price, string barCode)
         {
             Name = name;
