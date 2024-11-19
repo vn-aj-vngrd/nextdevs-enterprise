@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard | NextDevs Inc."
+  title: "AI | NextDevs Inc."
 };
 
 export default function Page() {

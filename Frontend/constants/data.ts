@@ -126,33 +126,44 @@ export const navItems: NavItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: "dashboard",
     isActive: false,
     shortcut: ["d", "d"],
     items: []
   },
   {
-    title: "Employee",
-    url: "/employee",
-    icon: "user",
-    shortcut: ["e", "e"],
-    isActive: false,
+    title: "Products",
+    url: "/products",
+    shortcut: ["p", "p"],
     items: []
   },
   {
-    title: "Product",
-    url: "/product",
-    icon: "product",
-    shortcut: ["p", "p"],
-    isActive: false,
+    title: "Orders",
+    url: "/orders",
+    shortcut: ["0", "o"],
+    items: []
+  },
+  {
+    title: "Employees",
+    url: "/employees",
+    shortcut: ["e", "e"],
+    items: []
+  },
+  {
+    title: "Users",
+    url: "/users",
+    shortcut: ["u", "u"],
     items: []
   },
   {
     title: "Kanban",
     url: "/kanban",
-    icon: "kanban",
     shortcut: ["k", "k"],
-    isActive: false,
+    items: []
+  },
+  {
+    title: "AI",
+    url: "/ai",
+    shortcut: ["a", "a"],
     items: []
   }
 ];

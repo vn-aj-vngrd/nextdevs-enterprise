@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Products | NextDevs Inc."
+  title: "Kanban | NextDevs Inc."
 };
 
 export default function Page() {
