@@ -1,8 +1,21 @@
 import { NextAuthConfig } from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
-import { authenticate } from "./server/account";
+import { AuthenticationRequest } from "./lib/api-client";
+import { client } from "./lib/client";
+
+const protectedRoutes = [
+  "/dashboard, /employees",
+  "/orders",
+  "/products",
+  "/users",
+  "/ai",
+  "kanban"
+];
 
 const authConfig = {
+  session: {
+    strategy: "jwt"
+  },
   providers: [
     CredentialProvider({
       credentials: {
@@ -14,45 +27,46 @@ const authConfig = {
         }
       },
       async authorize(credentials) {
-        const uri = `${process.env.NEXT_PUBLIC_API_URL}/account/authenticate`;
-
-        const response = await fetch(uri, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(credentials)
-        });
-
-        const result = await response.json();
-        const data = result.data;
-
-        if (data) {
-          return {
-            id: data.id,
-            name: data.userName,
-            email: data.email
-          };
-        } else {
-          throw new Error(result.errors);
+        if (!credentials.username || !credentials.password) {
+          throw new Error("Missing credentials");
         }
+
+        const body: AuthenticationRequest = {
+          userName: credentials.username as string,
+          password: credentials.password as string
+        };
+
+        const res = await client.authenticate(body);
+
+        if (res.success === false) {
+          return null;
+        }
+
+        return {
+          id: res.data!.id,
+          name: res.data!.userName,
+          email: res.data!.email
+        };
       }
     })
   ],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
-      if (isOnDashboard) {
+      const isOnProtectedRoute = protectedRoutes.some(
+        (route) => nextUrl.pathname === route
+      );
+
+      if (!isOnProtectedRoute) {
         if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
+        return false;
       } else if (isLoggedIn) {
         return Response.redirect(new URL("/dashboard", nextUrl));
       }
+
       return true;
     }
   },
-
   pages: {
     signIn: "/"
   }
