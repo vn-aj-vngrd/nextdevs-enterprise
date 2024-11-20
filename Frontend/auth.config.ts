@@ -1,11 +1,12 @@
 import { NextAuthConfig } from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
+import { authenticate } from "./server/account";
 
 const authConfig = {
   providers: [
     CredentialProvider({
       credentials: {
-        username: {
+        userName: {
           type: "text"
         },
         password: {
@@ -13,17 +14,19 @@ const authConfig = {
         }
       },
       async authorize(credentials, req) {
-        setTimeout(() => {}, 5000);
-        const user = {
+        const res = authenticate({
+          userName: credentials.userName as string,
+          password: credentials.password as string
+        });
+
+        // If no error is thrown, the user is authenticated
+
+        // If the user is authenticated, return an object with the user info
+        return {
           id: "1",
-          name: "John",
-          email: "test"
+          name: "John Doe",
+          email: ""
         };
-        if (user) {
-          return user;
-        } else {
-          return null;
-        }
       }
     })
   ],
