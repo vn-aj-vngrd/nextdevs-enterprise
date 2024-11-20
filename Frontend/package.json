@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier . --write",
-    "generate:client": "nswag openapi2tsclient /input:http://localhost:5000/swagger/v1/swagger.json /output:./server/api-client.ts /template:Fetch"
+    "generate:client": "nswag openapi2tsclient /input:http://localhost:5000/swagger/v1/swagger.json /output:./lib/api-client.ts /template:axios /TypeStyle:Interface"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
