@@ -10,6 +10,7 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authenticate } from "@/server/account";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -49,6 +50,12 @@ export default function UserAuthForm() {
         callbackUrl: callbackUrl ?? "/dashboard"
       });
     });
+    // const res = await authenticate({
+    //   userName: data.username,
+    //   password: data.password
+    // });
+
+    // console.log(res);
   };
 
   return (

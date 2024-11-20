@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "../ui/tooltip";
-import ThemeToggle from "./ThemeToggle/theme-toggle";
+import ThemeToggle from "./theme-toggle/theme-toggle";
 
 export default function Header() {
   return (

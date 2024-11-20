@@ -1,12 +1,13 @@
 "use client";
 
-import ThemeProvider from "./ThemeToggle/theme-provider";
+import ThemeProvider from "../layout/theme-toggle/theme-provider";
 import { SessionProvider, SessionProviderProps } from "next-auth/react";
 import {
   isServer,
   QueryClient,
   QueryClientProvider
 } from "@tanstack/react-query";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -53,7 +54,9 @@ export default function Providers({
     <>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <QueryClientProvider client={queryClient}>
-          <SessionProvider session={session}>{children}</SessionProvider>
+          <SessionProvider session={session}>
+            <NuqsAdapter>{children}</NuqsAdapter>
+          </SessionProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </>

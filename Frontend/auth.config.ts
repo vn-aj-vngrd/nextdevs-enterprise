@@ -6,27 +6,36 @@ const authConfig = {
   providers: [
     CredentialProvider({
       credentials: {
-        userName: {
+        username: {
           type: "text"
         },
         password: {
           type: "password"
         }
       },
-      async authorize(credentials, req) {
-        const res = authenticate({
-          userName: credentials.userName as string,
-          password: credentials.password as string
+      async authorize(credentials) {
+        const uri = `${process.env.NEXT_PUBLIC_API_URL}/account/authenticate`;
+
+        const response = await fetch(uri, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(credentials)
         });
 
-        // If no error is thrown, the user is authenticated
+        const result = await response.json();
+        const data = result.data;
 
-        // If the user is authenticated, return an object with the user info
-        return {
-          id: "1",
-          name: "John Doe",
-          email: ""
-        };
+        if (data) {
+          return {
+            id: data.id,
+            name: data.userName,
+            email: data.email
+          };
+        } else {
+          throw new Error(result.errors);
+        }
       }
     })
   ],

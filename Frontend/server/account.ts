@@ -7,10 +7,10 @@ interface Account {
 
 export async function authenticate(account: Account) {
   try {
-    const response = await axiosInstance.post("/api/authenticate", account);
-    return response.data; // Return only the data if needed
+    const response = await axiosInstance.post("/account/authenticate", account);
+    return response;
   } catch (error) {
     console.error("Authentication error:", error);
-    throw error; // Re-throw for handling elsewhere
+    throw error;
   }
 }
