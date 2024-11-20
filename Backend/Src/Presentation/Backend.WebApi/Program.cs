@@ -39,7 +39,6 @@ builder.Services.AddAnyCors();
 builder.Services.AddCustomLocalization(builder.Configuration);
 builder.Services.AddHealthChecks();
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
-builder.Services.AddOpenApiDocument();
 
 var app = builder.Build();
 
@@ -63,8 +62,6 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerWithVersioning();
-    app.UseOpenApi();
-    app.UseSwaggerUi();
 }
 
 app.UseCustomLocalization();
