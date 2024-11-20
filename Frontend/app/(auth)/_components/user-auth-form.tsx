@@ -1,5 +1,7 @@
 "use client";
 
+import { Icons } from "@/components/icons";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,8 +12,8 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { authenticate } from "@/server/account";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
@@ -32,7 +34,8 @@ type UserFormValue = z.infer<typeof formSchema>;
 export default function UserAuthForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
-  const [loading, startTransition] = useTransition();
+  const error = searchParams.get("error");
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
@@ -50,16 +53,23 @@ export default function UserAuthForm() {
         callbackUrl: callbackUrl ?? "/dashboard"
       });
     });
-    // const res = await authenticate({
-    //   userName: data.username,
-    //   password: data.password
-    // });
-
-    // console.log(res);
   };
 
   return (
     <Form {...form}>
+      {error && (
+        <Alert
+          variant="destructive"
+          className="mb-4 flex items-center justify-start gap-3"
+        >
+          <div>
+            <AlertCircle className="h-4 w-4" />
+          </div>
+
+          <AlertDescription>Invalid username or password</AlertDescription>
+        </Alert>
+      )}
+
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="grid w-full gap-4"
@@ -74,7 +84,7 @@ export default function UserAuthForm() {
                 <Input
                   type="string"
                   placeholder="Enter your username"
-                  disabled={loading}
+                  disabled={isPending}
                   {...field}
                 />
               </FormControl>
@@ -93,7 +103,7 @@ export default function UserAuthForm() {
                 <Input
                   type="password"
                   placeholder="Enter your password"
-                  disabled={loading}
+                  disabled={isPending}
                   {...field}
                 />
               </FormControl>
@@ -102,8 +112,15 @@ export default function UserAuthForm() {
           )}
         />
 
-        <Button disabled={loading} className="ml-auto w-full" type="submit">
-          {loading ? "Signing In..." : "Sign In"}
+        <Button disabled={isPending} className="ml-auto w-full" type="submit">
+          {isPending ? (
+            <div className="flex items-center gap-2">
+              <Icons.spinner className="h-4 w-4 animate-spin" />
+              Loading...
+            </div>
+          ) : (
+            "Sign In"
+          )}
         </Button>
       </form>
     </Form>
