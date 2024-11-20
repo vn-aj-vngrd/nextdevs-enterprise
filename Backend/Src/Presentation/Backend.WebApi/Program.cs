@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,7 @@ builder.Services.AddAnyCors();
 builder.Services.AddCustomLocalization(builder.Configuration);
 builder.Services.AddHealthChecks();
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
+builder.Services.AddOpenApiDocument();
 
 var app = builder.Build();
 
@@ -58,12 +60,18 @@ using (var scope = app.Services.CreateScope())
     await DefaultData.SeedAsync(services.GetRequiredService<ApplicationDbContext>());
 }
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwaggerWithVersioning();
+    app.UseOpenApi();
+    app.UseSwaggerUi();
+}
+
 app.UseCustomLocalization();
 app.UseAnyCors();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSwaggerWithVersioning();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHealthChecks("/health");
 app.MapControllers();
