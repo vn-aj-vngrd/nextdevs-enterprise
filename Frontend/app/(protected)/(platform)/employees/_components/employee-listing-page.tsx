@@ -29,7 +29,7 @@ export default async function EmployeeListingPage() {
   const employee: Employee[] = data.users;
 
   return (
-    <PageContainer scrollable>
+    <PageContainer scrollable={false}>
       <div className="space-y-4">
         <div className="flex items-start justify-between">
           <Heading
