@@ -12,4 +12,5 @@ public interface IAccountServices
     Task<BaseResult> ChangeUserName(ChangeUserNameRequest model);
     Task<BaseResult<AuthenticationResponse>> Authenticate(AuthenticationRequest request);
     Task<BaseResult<AuthenticationResponse>> AuthenticateByUserName(string username);
+    Task<BaseResult<UserDto>> GetProfile();
 }

@@ -1,8 +1,7 @@
-import { auth } from "@/auth";
+import { auth } from "@/app/auth/auth";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import NextTopLoader from "nextjs-toploader";
 import Providers from "@/components/providers/providers";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -18,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "NextDevs",
+  title: "NextDevs Inc.",
   description: ""
 };
 
@@ -34,8 +33,6 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased`}
       >
-        {/* <NextTopLoader showSpinner={false} /> */}
-
         <Providers session={session}>
           <Toaster />
           {children}

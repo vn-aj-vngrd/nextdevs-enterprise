@@ -4,6 +4,7 @@ import Header from "@/components/layout/header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import SetAccessToken from "@/components/set-access-token";
 
 export const metadata: Metadata = {
   title: "NextDevs Inc."
@@ -19,6 +20,7 @@ export default async function DashboardLayout({
     cookieStore.get("sidebar:state")?.value === "true" || true;
   return (
     <KBar>
+      <SetAccessToken />
       <SidebarProvider defaultOpen={defaultOpen}>
         <AppSidebar />
         <SidebarInset>

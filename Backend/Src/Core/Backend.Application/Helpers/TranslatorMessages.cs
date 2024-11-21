@@ -11,6 +11,11 @@ public static class TranslatorMessages
             return new TranslatorMessageDto(nameof(Account_NotFound_with_UserName), [userName]);
         }
 
+        public static TranslatorMessageDto Account_NotFound_with_UserId(string userId)
+        {
+            return new TranslatorMessageDto(nameof(Account_NotFound_with_UserId), [userId]);
+        }
+
         public static TranslatorMessageDto Username_is_already_taken(string userName)
         {
             return new TranslatorMessageDto(nameof(Username_is_already_taken), [userName]);

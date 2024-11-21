@@ -3,14 +3,14 @@
 // https://nextjs.org/docs/app/building-your-application/routing/middleware
 
 import NextAuth from "next-auth";
-import authConfig from "./auth.config";
+import authConfig from "./auth/auth.config";
 
 const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
-  if (!req.auth) {
-    const url = req.url.replace(req.nextUrl.pathname, "/");
-    return Response.redirect(url);
+  if (!req.auth && req.nextUrl.pathname !== "/auth/sign-in") {
+    const newUrl = new URL("/auth/sign-in", req.nextUrl.origin);
+    return Response.redirect(newUrl);
   }
 });
 

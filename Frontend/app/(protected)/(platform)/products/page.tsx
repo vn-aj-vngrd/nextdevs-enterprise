@@ -7,37 +7,35 @@ import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { Shell } from "@/components/shell";
 
-import { FeatureFlagsProvider } from "./_components/feature-flags-provider";
-import { TasksTable } from "./_components/tasks-table";
-import {
-  getTaskPriorityCounts,
-  getTasks,
-  getTaskStatusCounts
-} from "./_lib/queries";
+import { ProductTable } from "./_components/product-table";
 import { searchParamsCache } from "./_lib/validations";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient
+} from "@tanstack/react-query";
+import { client } from "@/lib/client";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;
 }
 
 export default async function IndexPage(props: IndexPageProps) {
+  const queryClient = new QueryClient();
   const searchParams = await props.searchParams;
   const search = searchParamsCache.parse(searchParams);
 
   const validFilters = getValidFilters(search.filters);
 
-  const promises = Promise.all([
-    getTasks({
-      ...search,
-      filters: validFilters
-    }),
-    getTaskStatusCounts(),
-    getTaskPriorityCounts()
-  ]);
+  await queryClient.prefetchQuery({
+    queryKey: ["products"],
+    queryFn: () =>
+      client.getPagedListProduct(undefined, undefined, undefined, undefined)
+  });
 
   return (
-    <Shell className="gap-2">
-      <FeatureFlagsProvider>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <Shell className="gap-2">
         <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
           <DateRangePicker
             triggerSize="sm"
@@ -57,9 +55,9 @@ export default async function IndexPage(props: IndexPageProps) {
             />
           }
         >
-          <TasksTable promises={promises} />
+          <ProductTable />
         </React.Suspense>
-      </FeatureFlagsProvider>
-    </Shell>
+      </Shell>
+    </HydrationBoundary>
   );
 }

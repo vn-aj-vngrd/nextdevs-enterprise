@@ -101,6 +101,27 @@ public class AccountServices(
         }
     }
 
+    public async Task<BaseResult<UserDto>> GetProfile()
+    {
+        var user = await userManager.FindByIdAsync(authenticatedUser.UserId);
+
+        if (user == null)
+            return new Error(ErrorCode.NotFound,
+                translator.GetString(
+                    TranslatorMessages.AccountMessages.Account_NotFound_with_UserId(authenticatedUser.UserId)),
+                nameof(authenticatedUser.UserId));
+
+        return new UserDto
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Name = user.Name,
+            Created = user.Created,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber
+        };
+    }
+
     private async Task<AuthenticationResponse> GetAuthenticationResponse(ApplicationUser user)
     {
         await userManager.UpdateSecurityStampAsync(user);

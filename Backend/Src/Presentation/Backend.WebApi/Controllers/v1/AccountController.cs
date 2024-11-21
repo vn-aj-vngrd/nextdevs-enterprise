@@ -30,6 +30,13 @@ public class AccountController(IAccountServices accountServices) : BaseApiContro
     {
         return await accountServices.ChangePassword(model);
     }
+    
+    [HttpGet]
+    [Authorize]
+    public async Task<BaseResult<UserDto>> GetProfile()
+    {
+        return await accountServices.GetProfile();
+    }
 
     [HttpPost]
     public async Task<BaseResult<AuthenticationResponse>> Start()

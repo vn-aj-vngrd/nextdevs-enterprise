@@ -1,16 +1,7 @@
 import { NextAuthConfig } from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
-import { AuthenticationRequest } from "./lib/api-client";
-import { client } from "./lib/client";
-
-const protectedRoutes = [
-  "/dashboard, /employees",
-  "/orders",
-  "/products",
-  "/users",
-  "/ai",
-  "kanban"
-];
+import { AuthenticationRequest } from "../../lib/api-client";
+import { client } from "../../lib/client";
 
 const authConfig = {
   session: {
@@ -45,30 +36,35 @@ const authConfig = {
         return {
           id: res.data!.id,
           name: res.data!.userName,
-          email: res.data!.email
+          email: res.data!.email,
+          accessToken: res.data!.jwToken
         };
       }
     })
   ],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnProtectedRoute = protectedRoutes.some(
-        (route) => nextUrl.pathname === route
-      );
-
-      if (!isOnProtectedRoute) {
-        if (isLoggedIn) return true;
-        return false;
-      } else if (isLoggedIn) {
-        return Response.redirect(new URL("/dashboard", nextUrl));
+      return !!auth;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.accessToken = user.accessToken;
       }
 
-      return true;
+      return token;
+    },
+    async session({ session, token, user }) {
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.accessToken = token.accessToken as string;
+      }
+
+      return session;
     }
   },
   pages: {
-    signIn: "/"
+    signIn: "auth/sign-in"
   }
 } satisfies NextAuthConfig;
 
