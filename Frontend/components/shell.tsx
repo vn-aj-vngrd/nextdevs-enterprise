@@ -1,26 +1,26 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const shellVariants = cva("grid items-center gap-8 pb-8 pt-6 md:py-8", {
+const shellVariants = cva("grid items-center gap-4 px-6 py-2", {
   variants: {
     variant: {
-      default: "container",
+      default: "w-full",
       sidebar: "",
       centered: "container flex h-dvh max-w-2xl flex-col justify-center py-16",
-      markdown: "container max-w-3xl py-8 md:py-10 lg:py-10",
-    },
+      markdown: "container max-w-3xl py-8 md:py-10 lg:py-10"
+    }
   },
   defaultVariants: {
-    variant: "default",
-  },
-})
+    variant: "default"
+  }
+});
 
 interface ShellProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof shellVariants> {
-  as?: React.ElementType
+  as?: React.ElementType;
 }
 
 function Shell({
@@ -31,7 +31,7 @@ function Shell({
 }: ShellProps) {
   return (
     <Comp className={cn(shellVariants({ variant }), className)} {...props} />
-  )
+  );
 }
 
-export { Shell, shellVariants }
+export { Shell, shellVariants };
