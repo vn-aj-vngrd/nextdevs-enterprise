@@ -13,4 +13,5 @@ public interface IAccountServices
     Task<BaseResult<AuthenticationResponse>> Authenticate(AuthenticationRequest request);
     Task<BaseResult<AuthenticationResponse>> AuthenticateByUserName(string username);
     Task<BaseResult<UserDto>> GetProfile();
+    Task<BaseResult> CheckTokenValidity();
 }

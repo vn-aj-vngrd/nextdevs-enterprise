@@ -18,7 +18,7 @@ public class AccountController(IAccountServices accountServices) : BaseApiContro
     }
 
     [HttpPut]
-    [Authorize]  
+    [Authorize]
     public async Task<BaseResult> ChangeUserName(ChangeUserNameRequest model)
     {
         return await accountServices.ChangeUserName(model);
@@ -30,7 +30,7 @@ public class AccountController(IAccountServices accountServices) : BaseApiContro
     {
         return await accountServices.ChangePassword(model);
     }
-    
+
     [HttpGet]
     [Authorize]
     public async Task<BaseResult<UserDto>> GetProfile()
@@ -43,5 +43,12 @@ public class AccountController(IAccountServices accountServices) : BaseApiContro
     {
         var ghostUsername = await accountServices.RegisterGhostAccount();
         return await accountServices.AuthenticateByUserName(ghostUsername.Data);
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<BaseResult> CheckTokenValidity()
+    {
+        return await accountServices.CheckTokenValidity();
     }
 }

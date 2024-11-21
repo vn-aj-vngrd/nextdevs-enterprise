@@ -122,6 +122,19 @@ public class AccountServices(
         };
     }
 
+    public async Task<BaseResult> CheckTokenValidity()
+    {
+        var user = await userManager.FindByIdAsync(authenticatedUser.UserId);
+
+        if (user == null)
+            return new Error(ErrorCode.NotFound,
+                translator.GetString(
+                    TranslatorMessages.AccountMessages.Account_NotFound_with_UserId(authenticatedUser.UserId)),
+                nameof(authenticatedUser.UserId));
+
+        return BaseResult.Ok();
+    }
+
     private async Task<AuthenticationResponse> GetAuthenticationResponse(ApplicationUser user)
     {
         await userManager.UpdateSecurityStampAsync(user);
