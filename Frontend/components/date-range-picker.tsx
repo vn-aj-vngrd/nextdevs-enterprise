@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { parseAsString, useQueryStates } from "nuqs"
-import { type DateRange } from "react-day-picker"
+import * as React from "react";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { parseAsString, useQueryStates } from "nuqs";
+import { type DateRange } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { Button, type ButtonProps } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils";
+import { Button, type ButtonProps } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+  PopoverTrigger
+} from "@/components/ui/popover";
 
 interface DateRangePickerProps
   extends React.ComponentPropsWithoutRef<typeof PopoverContent> {
@@ -23,42 +23,42 @@ interface DateRangePickerProps
    * @type DateRange
    * @example { from: new Date(), to: new Date() }
    */
-  defaultDateRange?: DateRange
+  defaultDateRange?: DateRange;
 
   /**
    * The placeholder text of the calendar trigger button.
    * @default "Pick a date"
    * @type string | undefined
    */
-  placeholder?: string
+  placeholder?: string;
 
   /**
    * The variant of the calendar trigger button.
    * @default "outline"
    * @type "default" | "outline" | "secondary" | "ghost"
    */
-  triggerVariant?: Exclude<ButtonProps["variant"], "destructive" | "link">
+  triggerVariant?: Exclude<ButtonProps["variant"], "destructive" | "link">;
 
   /**
    * The size of the calendar trigger button.
    * @default "default"
    * @type "default" | "sm" | "lg"
    */
-  triggerSize?: Exclude<ButtonProps["size"], "icon">
+  triggerSize?: Exclude<ButtonProps["size"], "icon">;
 
   /**
    * The class name of the calendar trigger button.
    * @default undefined
    * @type string
    */
-  triggerClassName?: string
+  triggerClassName?: string;
 
   /**
    * Controls whether query states are updated client-side only (default: true).
    * Setting to `false` triggers a network request to update the querystring.
    * @default true
    */
-  shallow?: boolean
+  shallow?: boolean;
 }
 
 export function DateRangePicker({
@@ -76,26 +76,26 @@ export function DateRangePicker({
       from: parseAsString.withDefault(
         defaultDateRange?.from?.toISOString() ?? ""
       ),
-      to: parseAsString.withDefault(defaultDateRange?.to?.toISOString() ?? ""),
+      to: parseAsString.withDefault(defaultDateRange?.to?.toISOString() ?? "")
     },
     {
       clearOnDefault: true,
-      shallow,
+      shallow
     }
-  )
+  );
 
   const date = React.useMemo(() => {
     function parseDate(dateString: string | null) {
-      if (!dateString) return undefined
-      const parsedDate = new Date(dateString)
-      return isNaN(parsedDate.getTime()) ? undefined : parsedDate
+      if (!dateString) return undefined;
+      const parsedDate = new Date(dateString);
+      return isNaN(parsedDate.getTime()) ? undefined : parsedDate;
     }
 
     return {
       from: parseDate(dateParams.from) ?? defaultDateRange?.from,
-      to: parseDate(dateParams.to) ?? defaultDateRange?.to,
-    }
-  }, [dateParams, defaultDateRange])
+      to: parseDate(dateParams.to) ?? defaultDateRange?.to
+    };
+  }, [dateParams, defaultDateRange]);
 
   return (
     <div className="grid gap-2">
@@ -134,13 +134,13 @@ export function DateRangePicker({
             onSelect={(newDateRange) => {
               void setDateParams({
                 from: newDateRange?.from?.toISOString() ?? "",
-                to: newDateRange?.to?.toISOString() ?? "",
-              })
+                to: newDateRange?.to?.toISOString() ?? ""
+              });
             }}
             numberOfMonths={2}
           />
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }
