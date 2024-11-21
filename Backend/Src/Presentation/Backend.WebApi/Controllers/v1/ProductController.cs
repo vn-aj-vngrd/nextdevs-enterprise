@@ -22,6 +22,7 @@ public class ProductController : BaseApiController
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<BaseResult<ProductDto>> GetProductById([FromQuery] GetProductByIdQuery model)
     {
         return await Mediator.Send(model);
