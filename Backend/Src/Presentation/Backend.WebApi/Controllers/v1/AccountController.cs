@@ -51,4 +51,11 @@ public class AccountController(IAccountServices accountServices) : BaseApiContro
     {
         return await accountServices.CheckTokenValidity();
     }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<BaseResult> Logout()
+    {
+        return await accountServices.Logout();
+    }
 }

@@ -166,4 +166,10 @@ public class AccountServices(
                 signingCredentials: signingCredentials);
         }
     }
+    
+    public async Task<BaseResult> Logout()
+    {
+        await signInManager.SignOutAsync();
+        return BaseResult.Ok();
+    }
 }
