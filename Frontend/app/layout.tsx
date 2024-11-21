@@ -34,7 +34,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased`}
       >
-        <NextTopLoader showSpinner={false} />
+        {/* <NextTopLoader showSpinner={false} /> */}
 
         <Providers session={session}>
           <Toaster />
