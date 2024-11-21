@@ -54,7 +54,7 @@ const authConfig = {
 
       return token;
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
         session.user.accessToken = token.accessToken as string;
