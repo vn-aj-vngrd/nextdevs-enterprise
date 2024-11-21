@@ -23,10 +23,12 @@ import * as z from "zod";
 const formSchema = z.object({
   username: z
     .string()
-    .min(3, { message: "Username must be at least 3 characters" }),
+    .min(1, { message: "Username is required" })
+    .max(255, { message: "Username is too long" }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 6 characters" })
+    .min(1, { message: "Password is required" })
+    .max(255, { message: "Password is too long" })
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
