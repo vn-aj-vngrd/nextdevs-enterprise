@@ -30,7 +30,7 @@ export function ProductTableToolbarActions({
         size="sm"
         onClick={() =>
           exportTableToCSV(table, {
-            filename: "tasks",
+            filename: "products",
             excludeColumns: ["select", "actions"]
           })
         }
