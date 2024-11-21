@@ -59,7 +59,6 @@ export function getColumns({
         </div>
       )
     },
-
     {
       accessorKey: "price",
       header: ({ column }) => (
