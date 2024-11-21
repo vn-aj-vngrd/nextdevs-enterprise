@@ -46,7 +46,13 @@ export function ProductTable() {
    * @prop {React.ReactNode} [icon] - An optional icon to display next to the label.
    * @prop {boolean} [withCount] - An optional boolean to display the count of the filter option.
    */
-  const filterFields: DataTableFilterField<ProductDto>[] = [];
+  const filterFields: DataTableFilterField<ProductDto>[] = [
+    {
+      id: "name",
+      label: "Name",
+      placeholder: "Search by name"
+    }
+  ];
 
   /**
    * Advanced filter fields for the data table.
@@ -60,22 +66,21 @@ export function ProductTable() {
    */
   const advancedFilterFields: DataTableAdvancedFilterField<ProductDto>[] = [];
 
+  const enableAdvancedTable = false;
+
   const { table } = useDataTable({
     data: data?.data ?? [],
     columns,
     pageCount,
     filterFields,
-    enableAdvancedFilter: true,
+    enableAdvancedFilter: enableAdvancedTable,
     initialState: {
-      sorting: [{ id: "name", desc: true }],
       columnPinning: { right: ["actions"] }
     },
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
     shallow: false,
     clearOnDefault: true
   });
-
-  const enableAdvancedTable = false;
 
   return (
     <>

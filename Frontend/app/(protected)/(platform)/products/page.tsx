@@ -5,7 +5,6 @@ import { getValidFilters } from "@/lib/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { DateRangePicker } from "@/components/date-range-picker";
-import { Shell } from "@/components/shell";
 
 import { ProductTable } from "./_components/product-table";
 import { searchParamsCache } from "./_lib/validations";
@@ -15,6 +14,9 @@ import {
   QueryClient
 } from "@tanstack/react-query";
 import { client } from "@/lib/client";
+import { Heading } from "@/components/ui/heading";
+import { Separator } from "@/components/ui/separator";
+import { Shell } from "@/components/shell";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;
@@ -34,30 +36,38 @@ export default async function IndexPage(props: IndexPageProps) {
   });
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <Shell className="gap-2">
-        <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
-          <DateRangePicker
-            triggerSize="sm"
-            triggerClassName="ml-auto w-56 sm:w-60"
-            align="end"
-            shallow={false}
+    <Shell>
+      <Heading
+        title={`Products`}
+        description="Manage your products to keep track of your inventory."
+      />
+
+      <Separator />
+
+      <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
+        <DateRangePicker
+          triggerSize="sm"
+          triggerClassName="ml-auto w-56 sm:w-60"
+          align="end"
+          shallow={false}
+        />
+      </React.Suspense>
+
+      <React.Suspense
+        fallback={
+          <DataTableSkeleton
+            columnCount={6}
+            searchableColumnCount={1}
+            filterableColumnCount={2}
+            cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
+            shrinkZero
           />
-        </React.Suspense>
-        <React.Suspense
-          fallback={
-            <DataTableSkeleton
-              columnCount={6}
-              searchableColumnCount={1}
-              filterableColumnCount={2}
-              cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
-              shrinkZero
-            />
-          }
-        >
+        }
+      >
+        <HydrationBoundary state={dehydrate(queryClient)}>
           <ProductTable />
-        </React.Suspense>
-      </Shell>
-    </HydrationBoundary>
+        </HydrationBoundary>
+      </React.Suspense>
+    </Shell>
   );
 }
