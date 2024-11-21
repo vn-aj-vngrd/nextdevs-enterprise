@@ -14,6 +14,10 @@ import { ProductDto } from "@/lib/api-client";
 import { getColumns } from "./product-table-columns";
 import { useQuery } from "@tanstack/react-query";
 import { client } from "@/lib/client";
+import { ProductTableFloatingBar } from "./product-table-floating-bar";
+import { DataTableAdvancedToolbar } from "@/components/data-table/data-table-advanced-toolbar";
+import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
+import { ProductTableToolbarActions } from "./product-table-toolbar-actions";
 
 export function ProductTable() {
   const pageCount = 1;
@@ -71,25 +75,27 @@ export function ProductTable() {
     clearOnDefault: true
   });
 
+  const enableAdvancedTable = false;
+
   return (
     <>
       <DataTable
         table={table}
-        // floatingBar={<TasksTableFloatingBar table={table} />}
+        floatingBar={<ProductTableFloatingBar table={table} />}
       >
-        {/* {enableAdvancedTable ? (
+        {enableAdvancedTable ? (
           <DataTableAdvancedToolbar
             table={table}
             filterFields={advancedFilterFields}
             shallow={false}
           >
-            <TasksTableToolbarActions table={table} />
+            <ProductTableToolbarActions table={table} />
           </DataTableAdvancedToolbar>
         ) : (
           <DataTableToolbar table={table} filterFields={filterFields}>
-            <TasksTableToolbarActions table={table} />
+            <ProductTableToolbarActions table={table} />
           </DataTableToolbar>
-        )} */}
+        )}
       </DataTable>
       {/* <UpdateTaskSheet
         open={rowAction?.type === "update"}

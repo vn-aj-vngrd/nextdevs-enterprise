@@ -31,38 +31,35 @@ export function getColumns({
 }: GetColumnsProps): ColumnDef<ProductDto>[] {
   return [
     {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="translate-y-0.5"
-        />
+      id: "name",
+      accessorKey: "name",
+      header: ({ table, column }) => (
+        <div className="flex items-center justify-start gap-8">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+          />
+          <DataTableColumnHeader column={column} title="NAME" />
+        </div>
       ),
       cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="translate-y-0.5"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false
+        <div className="flex items-center gap-8">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+          <div>{row.getValue("name")}</div>
+        </div>
+      )
     },
-    {
-      accessorKey: "name",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="NAME" />
-      ),
-      cell: ({ row }) => <div>{row.getValue("name")}</div>,
-      enableSorting: false,
-      enableHiding: false
-    },
+
     {
       accessorKey: "price",
       header: ({ column }) => (
