@@ -1,6 +1,7 @@
 using Backend.Application.DTOs;
 using Backend.Application.Features.Products.Queries.GetPagedListProduct;
 using Backend.Application.Interfaces.Repositories;
+using Backend.Application.Parameters;
 using Backend.Domain.Products.DTOs;
 using Moq;
 using Shouldly;
@@ -15,7 +16,24 @@ public class GetPagedListProductQueryHandlerTests
         // Arrange
         var pageNumber = 1;
         var pageSize = 10;
-        var productName = "Test Product";
+        var sortCriteria = new List<SortCriterion<ProductDto>>
+        {
+            new()
+            {
+                PropertySelector = dto => dto.Name,
+                Desc = false
+            }
+        };
+        var filters = new List<FilterCriterion<ProductDto>>
+        {
+            new()
+            {
+                PropertySelector = dto => dto.Price,
+                Operation = FilterOperation.GreaterThan,
+                Value = "1000"
+            }
+        };
+
 
         var products = new List<ProductDto>
         {
@@ -24,7 +42,7 @@ public class GetPagedListProductQueryHandlerTests
         };
 
         var productRepositoryMock = new Mock<IProductRepository>();
-        productRepositoryMock.Setup(repo => repo.GetPagedListAsync(pageNumber, pageSize, productName))
+        productRepositoryMock.Setup(repo => repo.GetPagedListAsync(pageNumber, pageSize, sortCriteria, filters))
             .ReturnsAsync(new PaginationResponseDto<ProductDto>(products, 100, pageNumber, pageSize));
 
         var handler = new GetPagedListProductQueryHandler(productRepositoryMock.Object);
@@ -33,7 +51,8 @@ public class GetPagedListProductQueryHandlerTests
         {
             PageNumber = pageNumber,
             PageSize = pageSize,
-            Name = productName
+            SortCriteria = sortCriteria,
+            Filters = filters
         };
 
         // Act

@@ -18,9 +18,10 @@ public class ProductFunctionalTests(CustomWebApplicationFactory<Program> factory
     {
         // Arrange
         var url = ApiRoutes.V1.Product.GetPagedListProduct;
+        var ghostAccount = await client.GetGhostAccount();
 
         // Act
-        var result = await client.GetAndDeserializeAsync<PagedResponse<ProductDto>>(url);
+        var result = await client.GetAndDeserializeAsync<PagedResponse<ProductDto>>(url, ghostAccount.JwToken);
 
         // Assert
         result.Success.ShouldBeTrue();
@@ -32,9 +33,10 @@ public class ProductFunctionalTests(CustomWebApplicationFactory<Program> factory
     {
         // Arrange
         var url = ApiRoutes.V1.Product.GetProductById.AddQueryString("id", "1");
+        var ghostAccount = await client.GetGhostAccount();
 
         // Act
-        var result = await client.GetAndDeserializeAsync<BaseResult<ProductDto>>(url);
+        var result = await client.GetAndDeserializeAsync<BaseResult<ProductDto>>(url, ghostAccount.JwToken);
 
         // Assert
         result.Success.ShouldBeTrue();
