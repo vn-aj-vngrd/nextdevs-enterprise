@@ -14,14 +14,15 @@ export const searchParamsCache = createSearchParamsCache({
   flags: parseAsArrayOf(z.enum(["advancedTable", "floatingBar"])).withDefault(
     []
   ),
-  page: parseAsInteger.withDefault(1),
-  perPage: parseAsInteger.withDefault(10),
+  pageNumber: parseAsInteger.withDefault(1),
+  pageSize: parseAsInteger.withDefault(10),
   sort: getSortingStateParser<ProductDto>().withDefault([
     { id: "name", desc: true }
   ]),
   title: parseAsString.withDefault(""),
   from: parseAsString.withDefault(""),
   to: parseAsString.withDefault(""),
+
   // advanced filter
   filters: getFiltersStateParser().withDefault([]),
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and")
