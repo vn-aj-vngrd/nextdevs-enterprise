@@ -10,7 +10,11 @@ import type {
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-table/data-table";
 
-import { ProductDto } from "@/lib/api-client";
+import {
+  ProductDto,
+  ProductDtoFilterCriterion,
+  ProductDtoSortCriterion
+} from "@/lib/api-client";
 import { getColumns } from "./product-table-columns";
 import { useQuery } from "@tanstack/react-query";
 import { client } from "@/lib/client";
@@ -19,12 +23,31 @@ import { DataTableAdvancedToolbar } from "@/components/data-table/data-table-adv
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { ProductTableToolbarActions } from "./product-table-toolbar-actions";
 
-export function ProductTable() {
-  const pageCount = 1;
+interface ProductTableProps {
+  name?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  sortCriteria: ProductDtoSortCriterion[];
+  filters: ProductDtoFilterCriterion[];
+}
+
+export function ProductTable({
+  name,
+  pageNumber,
+  pageSize,
+  sortCriteria,
+  filters
+}: ProductTableProps) {
   const { data } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", name],
     queryFn: () =>
-      client.getPagedListProduct(undefined, undefined, undefined, undefined)
+      client.getPagedListProduct(
+        name,
+        pageNumber ?? 1,
+        pageSize ?? 10,
+        undefined,
+        undefined
+      )
   });
 
   const [rowAction, setRowAction] =
@@ -71,7 +94,7 @@ export function ProductTable() {
   const { table } = useDataTable({
     data: data?.data ?? [],
     columns,
-    pageCount,
+    pageCount: data?.totalItems ?? 0,
     filterFields,
     enableAdvancedFilter: enableAdvancedTable,
     initialState: {
