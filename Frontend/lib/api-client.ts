@@ -347,6 +347,57 @@ export class Client {
     /**
      * @return OK
      */
+    logout( cancelToken?: CancelToken): Promise<BaseResult> {
+        let url_ = this.baseUrl + "/api/v1/Account/Logout";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processLogout(_response);
+        });
+    }
+
+    protected processLogout(response: AxiosResponse): Promise<BaseResult> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<BaseResult>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<BaseResult>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     getErrorCodes( cancelToken?: CancelToken): Promise<{ [key: string]: string; }> {
         let url_ = this.baseUrl + "/api/v1/Doc/GetErrorCodes";
         url_ = url_.replace(/[?&]$/, "");
@@ -512,17 +563,14 @@ export class Client {
     }
 
     /**
-     * @param name (optional) 
      * @param pageNumber (optional) 
      * @param pageSize (optional) 
+     * @param sortCriteria (optional) 
+     * @param filters (optional) 
      * @return OK
      */
-    getPagedListProduct(name: string | undefined, pageNumber: number | undefined, pageSize: number | undefined, cancelToken?: CancelToken): Promise<ProductDtoPagedResponse> {
+    getPagedListProduct(pageNumber: number | undefined, pageSize: number | undefined, sortCriteria: ProductDtoSortCriterion[] | undefined, filters: ProductDtoFilterCriterion[] | undefined, cancelToken?: CancelToken): Promise<ProductDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/v1/Product/GetPagedListProduct?";
-        if (name === null)
-            throw new Error("The parameter 'name' cannot be null.");
-        else if (name !== undefined)
-            url_ += "Name=" + encodeURIComponent("" + name) + "&";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
@@ -531,6 +579,24 @@ export class Client {
             throw new Error("The parameter 'pageSize' cannot be null.");
         else if (pageSize !== undefined)
             url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (sortCriteria === null)
+            throw new Error("The parameter 'sortCriteria' cannot be null.");
+        else if (sortCriteria !== undefined)
+            sortCriteria && sortCriteria.forEach((item, index) => {
+                for (const attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "SortCriteria[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (filters === null)
+            throw new Error("The parameter 'filters' cannot be null.");
+        else if (filters !== undefined)
+            filters && filters.forEach((item, index) => {
+                for (const attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -802,6 +868,27 @@ export class Client {
     }
 }
 
+export interface Assembly {
+    readonly definedTypes?: TypeInfo[] | undefined;
+    readonly exportedTypes?: Type[] | undefined;
+    readonly codeBase?: string | undefined;
+    entryPoint?: MethodInfo;
+    readonly fullName?: string | undefined;
+    readonly imageRuntimeVersion?: string | undefined;
+    readonly isDynamic?: boolean;
+    readonly location?: string | undefined;
+    readonly reflectionOnly?: boolean;
+    readonly isCollectible?: boolean;
+    readonly isFullyTrusted?: boolean;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly escapedCodeBase?: string | undefined;
+    manifestModule?: Module;
+    readonly modules?: Module[] | undefined;
+    readonly globalAssemblyCache?: boolean;
+    readonly hostContext?: number;
+    securityRuleSet?: SecurityRuleSet;
+}
+
 export interface AuthenticationRequest {
     userName?: string | undefined;
     password?: string | undefined;
@@ -827,6 +914,14 @@ export interface BaseResult {
     errors?: ErrorDto[] | undefined;
 }
 
+export enum CallingConventions {
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _32 = 32,
+    _64 = 64,
+}
+
 export interface ChangePasswordRequest {
     password?: string | undefined;
     confirmPassword?: string | undefined;
@@ -836,10 +931,64 @@ export interface ChangeUserNameRequest {
     userName?: string | undefined;
 }
 
+export interface ConstructorInfo {
+    readonly name?: string | undefined;
+    declaringType?: Type;
+    reflectedType?: Type;
+    module?: Module;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+    attributes?: MethodAttributes;
+    methodImplementationFlags?: MethodImplAttributes;
+    callingConvention?: CallingConventions;
+    readonly isAbstract?: boolean;
+    readonly isConstructor?: boolean;
+    readonly isFinal?: boolean;
+    readonly isHideBySig?: boolean;
+    readonly isSpecialName?: boolean;
+    readonly isStatic?: boolean;
+    readonly isVirtual?: boolean;
+    readonly isAssembly?: boolean;
+    readonly isFamily?: boolean;
+    readonly isFamilyAndAssembly?: boolean;
+    readonly isFamilyOrAssembly?: boolean;
+    readonly isPrivate?: boolean;
+    readonly isPublic?: boolean;
+    readonly isConstructedGenericMethod?: boolean;
+    readonly isGenericMethod?: boolean;
+    readonly isGenericMethodDefinition?: boolean;
+    readonly containsGenericParameters?: boolean;
+    methodHandle?: RuntimeMethodHandle;
+    readonly isSecurityCritical?: boolean;
+    readonly isSecuritySafeCritical?: boolean;
+    readonly isSecurityTransparent?: boolean;
+    memberType?: MemberTypes;
+}
+
 export interface CreateProductCommand {
     name?: string | undefined;
     price?: number;
     barCode?: string | undefined;
+}
+
+export interface CustomAttributeData {
+    attributeType?: Type;
+    constructor?: ConstructorInfo;
+    readonly constructorArguments?: CustomAttributeTypedArgument[] | undefined;
+    readonly namedArguments?: CustomAttributeNamedArgument[] | undefined;
+}
+
+export interface CustomAttributeNamedArgument {
+    memberInfo?: MemberInfo;
+    typedValue?: CustomAttributeTypedArgument;
+    readonly memberName?: string | undefined;
+    readonly isField?: boolean;
+}
+
+export interface CustomAttributeTypedArgument {
+    argumentType?: Type;
+    value?: any | undefined;
 }
 
 export interface ErrorDto {
@@ -857,10 +1006,407 @@ export enum ErrorCode {
     _5 = 5,
 }
 
+export enum EventAttributes {
+    _0 = 0,
+    _512 = 512,
+    _1024 = 1024,
+}
+
+export interface EventInfo {
+    readonly name?: string | undefined;
+    declaringType?: Type;
+    reflectedType?: Type;
+    module?: Module;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+    memberType?: MemberTypes;
+    attributes?: EventAttributes;
+    readonly isSpecialName?: boolean;
+    addMethod?: MethodInfo;
+    removeMethod?: MethodInfo;
+    raiseMethod?: MethodInfo;
+    readonly isMulticast?: boolean;
+    eventHandlerType?: Type;
+}
+
+export interface Expression {
+    nodeType?: ExpressionType;
+    type?: Type;
+    readonly canReduce?: boolean;
+}
+
+export enum ExpressionType {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+    _6 = 6,
+    _7 = 7,
+    _8 = 8,
+    _9 = 9,
+    _10 = 10,
+    _11 = 11,
+    _12 = 12,
+    _13 = 13,
+    _14 = 14,
+    _15 = 15,
+    _16 = 16,
+    _17 = 17,
+    _18 = 18,
+    _19 = 19,
+    _20 = 20,
+    _21 = 21,
+    _22 = 22,
+    _23 = 23,
+    _24 = 24,
+    _25 = 25,
+    _26 = 26,
+    _27 = 27,
+    _28 = 28,
+    _29 = 29,
+    _30 = 30,
+    _31 = 31,
+    _32 = 32,
+    _33 = 33,
+    _34 = 34,
+    _35 = 35,
+    _36 = 36,
+    _37 = 37,
+    _38 = 38,
+    _39 = 39,
+    _40 = 40,
+    _41 = 41,
+    _42 = 42,
+    _43 = 43,
+    _44 = 44,
+    _45 = 45,
+    _46 = 46,
+    _47 = 47,
+    _48 = 48,
+    _49 = 49,
+    _50 = 50,
+    _51 = 51,
+    _52 = 52,
+    _53 = 53,
+    _54 = 54,
+    _55 = 55,
+    _56 = 56,
+    _57 = 57,
+    _58 = 58,
+    _59 = 59,
+    _60 = 60,
+    _61 = 61,
+    _62 = 62,
+    _63 = 63,
+    _64 = 64,
+    _65 = 65,
+    _66 = 66,
+    _67 = 67,
+    _68 = 68,
+    _69 = 69,
+    _70 = 70,
+    _71 = 71,
+    _72 = 72,
+    _73 = 73,
+    _74 = 74,
+    _75 = 75,
+    _76 = 76,
+    _77 = 77,
+    _78 = 78,
+    _79 = 79,
+    _80 = 80,
+    _81 = 81,
+    _82 = 82,
+    _83 = 83,
+    _84 = 84,
+}
+
+export enum FieldAttributes {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+    _6 = 6,
+    _7 = 7,
+    _16 = 16,
+    _32 = 32,
+    _64 = 64,
+    _128 = 128,
+    _256 = 256,
+    _512 = 512,
+    _1024 = 1024,
+    _4096 = 4096,
+    _8192 = 8192,
+    _32768 = 32768,
+    _38144 = 38144,
+}
+
+export interface FieldInfo {
+    readonly name?: string | undefined;
+    declaringType?: Type;
+    reflectedType?: Type;
+    module?: Module;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+    memberType?: MemberTypes;
+    attributes?: FieldAttributes;
+    fieldType?: Type;
+    readonly isInitOnly?: boolean;
+    readonly isLiteral?: boolean;
+    readonly isNotSerialized?: boolean;
+    readonly isPinvokeImpl?: boolean;
+    readonly isSpecialName?: boolean;
+    readonly isStatic?: boolean;
+    readonly isAssembly?: boolean;
+    readonly isFamily?: boolean;
+    readonly isFamilyAndAssembly?: boolean;
+    readonly isFamilyOrAssembly?: boolean;
+    readonly isPrivate?: boolean;
+    readonly isPublic?: boolean;
+    readonly isSecurityCritical?: boolean;
+    readonly isSecuritySafeCritical?: boolean;
+    readonly isSecurityTransparent?: boolean;
+    fieldHandle?: RuntimeFieldHandle;
+}
+
+export enum FilterOperation {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+    _6 = 6,
+}
+
+export enum GenericParameterAttributes {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _8 = 8,
+    _16 = 16,
+    _28 = 28,
+    _32 = 32,
+}
+
+export interface ICustomAttributeProvider {
+}
+
 export interface Int64BaseResult {
     success?: boolean;
     errors?: ErrorDto[] | undefined;
     data?: number;
+}
+
+export interface IntPtr {
+}
+
+export enum LayoutKind {
+    _0 = 0,
+    _2 = 2,
+    _3 = 3,
+}
+
+export interface MemberInfo {
+    memberType?: MemberTypes;
+    readonly name?: string | undefined;
+    declaringType?: Type;
+    reflectedType?: Type;
+    module?: Module;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+}
+
+export enum MemberTypes {
+    _1 = 1,
+    _2 = 2,
+    _4 = 4,
+    _8 = 8,
+    _16 = 16,
+    _32 = 32,
+    _64 = 64,
+    _128 = 128,
+    _191 = 191,
+}
+
+export enum MethodAttributes {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+    _6 = 6,
+    _7 = 7,
+    _8 = 8,
+    _16 = 16,
+    _32 = 32,
+    _64 = 64,
+    _128 = 128,
+    _256 = 256,
+    _512 = 512,
+    _1024 = 1024,
+    _2048 = 2048,
+    _4096 = 4096,
+    _8192 = 8192,
+    _16384 = 16384,
+    _32768 = 32768,
+    _53248 = 53248,
+}
+
+export interface MethodBase {
+    memberType?: MemberTypes;
+    readonly name?: string | undefined;
+    declaringType?: Type;
+    reflectedType?: Type;
+    module?: Module;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+    attributes?: MethodAttributes;
+    methodImplementationFlags?: MethodImplAttributes;
+    callingConvention?: CallingConventions;
+    readonly isAbstract?: boolean;
+    readonly isConstructor?: boolean;
+    readonly isFinal?: boolean;
+    readonly isHideBySig?: boolean;
+    readonly isSpecialName?: boolean;
+    readonly isStatic?: boolean;
+    readonly isVirtual?: boolean;
+    readonly isAssembly?: boolean;
+    readonly isFamily?: boolean;
+    readonly isFamilyAndAssembly?: boolean;
+    readonly isFamilyOrAssembly?: boolean;
+    readonly isPrivate?: boolean;
+    readonly isPublic?: boolean;
+    readonly isConstructedGenericMethod?: boolean;
+    readonly isGenericMethod?: boolean;
+    readonly isGenericMethodDefinition?: boolean;
+    readonly containsGenericParameters?: boolean;
+    methodHandle?: RuntimeMethodHandle;
+    readonly isSecurityCritical?: boolean;
+    readonly isSecuritySafeCritical?: boolean;
+    readonly isSecurityTransparent?: boolean;
+}
+
+export enum MethodImplAttributes {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _8 = 8,
+    _16 = 16,
+    _32 = 32,
+    _64 = 64,
+    _128 = 128,
+    _256 = 256,
+    _512 = 512,
+    _4096 = 4096,
+    _65535 = 65535,
+}
+
+export interface MethodInfo {
+    readonly name?: string | undefined;
+    declaringType?: Type;
+    reflectedType?: Type;
+    module?: Module;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+    attributes?: MethodAttributes;
+    methodImplementationFlags?: MethodImplAttributes;
+    callingConvention?: CallingConventions;
+    readonly isAbstract?: boolean;
+    readonly isConstructor?: boolean;
+    readonly isFinal?: boolean;
+    readonly isHideBySig?: boolean;
+    readonly isSpecialName?: boolean;
+    readonly isStatic?: boolean;
+    readonly isVirtual?: boolean;
+    readonly isAssembly?: boolean;
+    readonly isFamily?: boolean;
+    readonly isFamilyAndAssembly?: boolean;
+    readonly isFamilyOrAssembly?: boolean;
+    readonly isPrivate?: boolean;
+    readonly isPublic?: boolean;
+    readonly isConstructedGenericMethod?: boolean;
+    readonly isGenericMethod?: boolean;
+    readonly isGenericMethodDefinition?: boolean;
+    readonly containsGenericParameters?: boolean;
+    methodHandle?: RuntimeMethodHandle;
+    readonly isSecurityCritical?: boolean;
+    readonly isSecuritySafeCritical?: boolean;
+    readonly isSecurityTransparent?: boolean;
+    memberType?: MemberTypes;
+    returnParameter?: ParameterInfo;
+    returnType?: Type;
+    returnTypeCustomAttributes?: ICustomAttributeProvider;
+}
+
+export interface Module {
+    assembly?: Assembly;
+    readonly fullyQualifiedName?: string | undefined;
+    readonly name?: string | undefined;
+    readonly mdStreamVersion?: number;
+    readonly moduleVersionId?: string;
+    readonly scopeName?: string | undefined;
+    moduleHandle?: ModuleHandle;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly metadataToken?: number;
+}
+
+export interface ModuleHandle {
+    readonly mdStreamVersion?: number;
+}
+
+export enum ParameterAttributes {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _4 = 4,
+    _8 = 8,
+    _16 = 16,
+    _4096 = 4096,
+    _8192 = 8192,
+    _16384 = 16384,
+    _32768 = 32768,
+    _61440 = 61440,
+}
+
+export interface ParameterExpression {
+    readonly canReduce?: boolean;
+    type?: Type;
+    nodeType?: ExpressionType;
+    readonly name?: string | undefined;
+    readonly isByRef?: boolean;
+}
+
+export interface ParameterInfo {
+    attributes?: ParameterAttributes;
+    member?: MemberInfo;
+    readonly name?: string | undefined;
+    parameterType?: Type;
+    readonly position?: number;
+    readonly isIn?: boolean;
+    readonly isLcid?: boolean;
+    readonly isOptional?: boolean;
+    readonly isOut?: boolean;
+    readonly isRetval?: boolean;
+    readonly defaultValue?: any | undefined;
+    readonly rawDefaultValue?: any | undefined;
+    readonly hasDefaultValue?: boolean;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly metadataToken?: number;
 }
 
 export interface ProductDto {
@@ -877,6 +1423,23 @@ export interface ProductDtoBaseResult {
     data?: ProductDto;
 }
 
+export interface ProductDtoFilterCriterion {
+    propertySelector?: ProductDtoObjectFuncExpression;
+    operation?: FilterOperation;
+    value?: any | undefined;
+}
+
+export interface ProductDtoObjectFuncExpression {
+    readonly canReduce?: boolean;
+    type?: Type;
+    nodeType?: ExpressionType;
+    readonly parameters?: ParameterExpression[] | undefined;
+    readonly name?: string | undefined;
+    body?: Expression;
+    returnType?: Type;
+    readonly tailCall?: boolean;
+}
+
 export interface ProductDtoPagedResponse {
     success?: boolean;
     errors?: ErrorDto[] | undefined;
@@ -887,10 +1450,257 @@ export interface ProductDtoPagedResponse {
     totalItems?: number;
 }
 
+export interface ProductDtoSortCriterion {
+    propertySelector?: ProductDtoObjectFuncExpression;
+    desc?: boolean;
+}
+
+export enum PropertyAttributes {
+    _0 = 0,
+    _512 = 512,
+    _1024 = 1024,
+    _4096 = 4096,
+    _8192 = 8192,
+    _16384 = 16384,
+    _32768 = 32768,
+    _62464 = 62464,
+}
+
+export interface PropertyInfo {
+    readonly name?: string | undefined;
+    declaringType?: Type;
+    reflectedType?: Type;
+    module?: Module;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+    memberType?: MemberTypes;
+    propertyType?: Type;
+    attributes?: PropertyAttributes;
+    readonly isSpecialName?: boolean;
+    readonly canRead?: boolean;
+    readonly canWrite?: boolean;
+    getMethod?: MethodInfo;
+    setMethod?: MethodInfo;
+}
+
+export interface RuntimeFieldHandle {
+    value?: IntPtr;
+}
+
+export interface RuntimeMethodHandle {
+    value?: IntPtr;
+}
+
+export interface RuntimeTypeHandle {
+    value?: IntPtr;
+}
+
+export enum SecurityRuleSet {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+}
+
 export interface StringBaseResult {
     success?: boolean;
     errors?: ErrorDto[] | undefined;
     data?: string | undefined;
+}
+
+export interface StructLayoutAttribute {
+    readonly typeId?: any | undefined;
+    value?: LayoutKind;
+}
+
+export interface Type {
+    readonly name?: string | undefined;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+    memberType?: MemberTypes;
+    readonly namespace?: string | undefined;
+    readonly assemblyQualifiedName?: string | undefined;
+    readonly fullName?: string | undefined;
+    assembly?: Assembly;
+    module?: Module;
+    readonly isInterface?: boolean;
+    readonly isNested?: boolean;
+    declaringType?: Type;
+    declaringMethod?: MethodBase;
+    reflectedType?: Type;
+    underlyingSystemType?: Type;
+    readonly isTypeDefinition?: boolean;
+    readonly isArray?: boolean;
+    readonly isByRef?: boolean;
+    readonly isPointer?: boolean;
+    readonly isConstructedGenericType?: boolean;
+    readonly isGenericParameter?: boolean;
+    readonly isGenericTypeParameter?: boolean;
+    readonly isGenericMethodParameter?: boolean;
+    readonly isGenericType?: boolean;
+    readonly isGenericTypeDefinition?: boolean;
+    readonly isSZArray?: boolean;
+    readonly isVariableBoundArray?: boolean;
+    readonly isByRefLike?: boolean;
+    readonly isFunctionPointer?: boolean;
+    readonly isUnmanagedFunctionPointer?: boolean;
+    readonly hasElementType?: boolean;
+    readonly genericTypeArguments?: Type[] | undefined;
+    readonly genericParameterPosition?: number;
+    genericParameterAttributes?: GenericParameterAttributes;
+    attributes?: TypeAttributes;
+    readonly isAbstract?: boolean;
+    readonly isImport?: boolean;
+    readonly isSealed?: boolean;
+    readonly isSpecialName?: boolean;
+    readonly isClass?: boolean;
+    readonly isNestedAssembly?: boolean;
+    readonly isNestedFamANDAssem?: boolean;
+    readonly isNestedFamily?: boolean;
+    readonly isNestedFamORAssem?: boolean;
+    readonly isNestedPrivate?: boolean;
+    readonly isNestedPublic?: boolean;
+    readonly isNotPublic?: boolean;
+    readonly isPublic?: boolean;
+    readonly isAutoLayout?: boolean;
+    readonly isExplicitLayout?: boolean;
+    readonly isLayoutSequential?: boolean;
+    readonly isAnsiClass?: boolean;
+    readonly isAutoClass?: boolean;
+    readonly isUnicodeClass?: boolean;
+    readonly isCOMObject?: boolean;
+    readonly isContextful?: boolean;
+    readonly isEnum?: boolean;
+    readonly isMarshalByRef?: boolean;
+    readonly isPrimitive?: boolean;
+    readonly isValueType?: boolean;
+    readonly isSignatureType?: boolean;
+    readonly isSecurityCritical?: boolean;
+    readonly isSecuritySafeCritical?: boolean;
+    readonly isSecurityTransparent?: boolean;
+    structLayoutAttribute?: StructLayoutAttribute;
+    typeInitializer?: ConstructorInfo;
+    typeHandle?: RuntimeTypeHandle;
+    readonly guid?: string;
+    baseType?: Type;
+    readonly isSerializable?: boolean;
+    readonly containsGenericParameters?: boolean;
+    readonly isVisible?: boolean;
+}
+
+export enum TypeAttributes {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+    _6 = 6,
+    _7 = 7,
+    _8 = 8,
+    _16 = 16,
+    _24 = 24,
+    _32 = 32,
+    _128 = 128,
+    _256 = 256,
+    _1024 = 1024,
+    _2048 = 2048,
+    _4096 = 4096,
+    _8192 = 8192,
+    _16384 = 16384,
+    _65536 = 65536,
+    _131072 = 131072,
+    _196608 = 196608,
+    _262144 = 262144,
+    _264192 = 264192,
+    _1048576 = 1048576,
+    _12582912 = 12582912,
+}
+
+export interface TypeInfo {
+    readonly name?: string | undefined;
+    readonly customAttributes?: CustomAttributeData[] | undefined;
+    readonly isCollectible?: boolean;
+    readonly metadataToken?: number;
+    memberType?: MemberTypes;
+    readonly namespace?: string | undefined;
+    readonly assemblyQualifiedName?: string | undefined;
+    readonly fullName?: string | undefined;
+    assembly?: Assembly;
+    module?: Module;
+    readonly isInterface?: boolean;
+    readonly isNested?: boolean;
+    declaringType?: Type;
+    declaringMethod?: MethodBase;
+    reflectedType?: Type;
+    underlyingSystemType?: Type;
+    readonly isTypeDefinition?: boolean;
+    readonly isArray?: boolean;
+    readonly isByRef?: boolean;
+    readonly isPointer?: boolean;
+    readonly isConstructedGenericType?: boolean;
+    readonly isGenericParameter?: boolean;
+    readonly isGenericTypeParameter?: boolean;
+    readonly isGenericMethodParameter?: boolean;
+    readonly isGenericType?: boolean;
+    readonly isGenericTypeDefinition?: boolean;
+    readonly isSZArray?: boolean;
+    readonly isVariableBoundArray?: boolean;
+    readonly isByRefLike?: boolean;
+    readonly isFunctionPointer?: boolean;
+    readonly isUnmanagedFunctionPointer?: boolean;
+    readonly hasElementType?: boolean;
+    readonly genericTypeArguments?: Type[] | undefined;
+    readonly genericParameterPosition?: number;
+    genericParameterAttributes?: GenericParameterAttributes;
+    attributes?: TypeAttributes;
+    readonly isAbstract?: boolean;
+    readonly isImport?: boolean;
+    readonly isSealed?: boolean;
+    readonly isSpecialName?: boolean;
+    readonly isClass?: boolean;
+    readonly isNestedAssembly?: boolean;
+    readonly isNestedFamANDAssem?: boolean;
+    readonly isNestedFamily?: boolean;
+    readonly isNestedFamORAssem?: boolean;
+    readonly isNestedPrivate?: boolean;
+    readonly isNestedPublic?: boolean;
+    readonly isNotPublic?: boolean;
+    readonly isPublic?: boolean;
+    readonly isAutoLayout?: boolean;
+    readonly isExplicitLayout?: boolean;
+    readonly isLayoutSequential?: boolean;
+    readonly isAnsiClass?: boolean;
+    readonly isAutoClass?: boolean;
+    readonly isUnicodeClass?: boolean;
+    readonly isCOMObject?: boolean;
+    readonly isContextful?: boolean;
+    readonly isEnum?: boolean;
+    readonly isMarshalByRef?: boolean;
+    readonly isPrimitive?: boolean;
+    readonly isValueType?: boolean;
+    readonly isSignatureType?: boolean;
+    readonly isSecurityCritical?: boolean;
+    readonly isSecuritySafeCritical?: boolean;
+    readonly isSecurityTransparent?: boolean;
+    structLayoutAttribute?: StructLayoutAttribute;
+    typeInitializer?: ConstructorInfo;
+    typeHandle?: RuntimeTypeHandle;
+    readonly guid?: string;
+    baseType?: Type;
+    readonly isSerializable?: boolean;
+    readonly containsGenericParameters?: boolean;
+    readonly isVisible?: boolean;
+    readonly genericTypeParameters?: Type[] | undefined;
+    readonly declaredConstructors?: ConstructorInfo[] | undefined;
+    readonly declaredEvents?: EventInfo[] | undefined;
+    readonly declaredFields?: FieldInfo[] | undefined;
+    readonly declaredMembers?: MemberInfo[] | undefined;
+    readonly declaredMethods?: MethodInfo[] | undefined;
+    readonly declaredNestedTypes?: TypeInfo[] | undefined;
+    readonly declaredProperties?: PropertyInfo[] | undefined;
+    readonly implementedInterfaces?: Type[] | undefined;
 }
 
 export interface UpdateProductCommand {
