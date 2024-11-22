@@ -14,11 +14,13 @@ import { dataTableConfig } from "@/config/data-table";
  * @param options - The options for generating pinning styles.
  * @param options.column - The column object for which to generate styles.
  * @param options.withBorder - Whether to show a box shadow between pinned and scrollable columns.
+ * @param options.isHeader - Whether the column is a header column.
  * @returns A React.CSSProperties object containing the calculated styles.
  */
 export function getCommonPinningStyles<TData>({
   column,
-  withBorder = false
+  withBorder = false,
+  isHeader = false
 }: {
   column: Column<TData>;
   /**
@@ -26,6 +28,11 @@ export function getCommonPinningStyles<TData>({
    * @default false
    */
   withBorder?: boolean;
+  /**
+   * Whether the column is a header column.
+   * @default false
+   */
+  isHeader?: boolean;
 }): React.CSSProperties {
   const isPinned = column.getIsPinned();
   const isLastLeftPinnedColumn =
@@ -45,7 +52,11 @@ export function getCommonPinningStyles<TData>({
     right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
     opacity: isPinned ? 0.97 : 1,
     position: isPinned ? "sticky" : "relative",
-    background: isPinned ? "hsl(var(--background))" : "hsl(var(--background))",
+    background: isHeader
+      ? "hsl(var(--secondary-background))"
+      : isPinned
+        ? "hsl(var(--background))"
+        : undefined,
     width: column.getSize(),
     zIndex: isPinned ? 1 : 0
   };
