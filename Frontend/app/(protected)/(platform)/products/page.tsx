@@ -16,7 +16,7 @@ import {
 import { client } from "@/lib/client";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { Shell } from "@/components/shell";
+import PageContainer from "@/components/layout/page-container";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;
@@ -36,7 +36,7 @@ export default async function IndexPage(props: IndexPageProps) {
   });
 
   return (
-    <div className="grid h-full gap-4 overflow-hidden px-6 py-4">
+    <PageContainer>
       <Heading
         title={`Products`}
         description="Manage your products to keep track of your inventory."
@@ -70,6 +70,6 @@ export default async function IndexPage(props: IndexPageProps) {
           </HydrationBoundary>
         </React.Suspense>
       </div>
-    </div>
+    </PageContainer>
   );
 }

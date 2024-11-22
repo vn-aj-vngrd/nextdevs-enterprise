@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function PageContainer({
   children,
-  scrollable = true
+  scrollable = false
 }: {
   children: React.ReactNode;
   scrollable?: boolean;
@@ -15,7 +15,9 @@ export default function PageContainer({
           <div className="h-full p-4 md:px-6">{children}</div>
         </ScrollArea>
       ) : (
-        <div className="h-full p-4 md:px-6">{children}</div>
+        <div className="grid h-full gap-4 overflow-hidden p-4 md:px-6">
+          {children}
+        </div>
       )}
     </>
   );
