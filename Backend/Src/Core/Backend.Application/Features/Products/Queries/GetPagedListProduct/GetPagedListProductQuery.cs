@@ -8,4 +8,5 @@ namespace Backend.Application.Features.Products.Queries.GetPagedListProduct;
 public class GetPagedListProductQuery : PaginationSortFilterRequestParameter<ProductDto>,
     IRequest<PagedResponse<ProductDto>>
 {
+    public string Name { get; set; } 
 }

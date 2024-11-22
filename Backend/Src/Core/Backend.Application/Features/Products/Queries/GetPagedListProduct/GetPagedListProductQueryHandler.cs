@@ -13,7 +13,7 @@ public class GetPagedListProductQueryHandler(IProductRepository productRepositor
     public async Task<PagedResponse<ProductDto>> Handle(GetPagedListProductQuery request,
         CancellationToken cancellationToken)
     {
-        return await productRepository.GetPagedListAsync(request.PageNumber, request.PageSize, request.SortCriteria,
+        return await productRepository.GetPagedListAsync(request.Name, request.PageNumber, request.PageSize, request.SortCriteria,
             request.Filters);
     }
 }

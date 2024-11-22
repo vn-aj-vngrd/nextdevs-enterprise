@@ -16,6 +16,7 @@ public class ProductRepository(ApplicationDbContext dbContext)
     : GenericRepository<Product>(dbContext), IProductRepository
 {
     public async Task<PaginationResponseDto<ProductDto>> GetPagedListAsync(
+        string name,
         int pageNumber,
         int pageSize,
         List<SortCriterion<ProductDto>> sortCriteria,
@@ -23,6 +24,10 @@ public class ProductRepository(ApplicationDbContext dbContext)
     {
         // Start with the base query
         var query = dbContext.Products.AsQueryable();
+        
+        // Apply name filter
+        if (!string.IsNullOrWhiteSpace(name))
+            query = query.Where(p => p.Name.Contains(name));
 
         // Apply dynamic filters
         if (filters != null && filters.Any())
