@@ -32,7 +32,13 @@ export default async function IndexPage(props: IndexPageProps) {
   await queryClient.prefetchQuery({
     queryKey: ["products"],
     queryFn: () =>
-      client.getPagedListProduct(undefined, undefined, undefined, undefined)
+      client.getPagedListProduct(
+        search.name,
+        search.pageNumber,
+        search.pageSize,
+        undefined,
+        undefined
+      )
   });
 
   return (
@@ -66,7 +72,13 @@ export default async function IndexPage(props: IndexPageProps) {
           }
         >
           <HydrationBoundary state={dehydrate(queryClient)}>
-            <ProductTable />
+            <ProductTable
+              name={search.name}
+              pageNumber={search.pageNumber}
+              pageSize={search.pageSize}
+              sortCriteria={search.sort}
+              filters={validFilters}
+            />
           </HydrationBoundary>
         </React.Suspense>
       </div>
