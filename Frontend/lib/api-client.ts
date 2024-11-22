@@ -563,14 +563,19 @@ export class Client {
     }
 
     /**
+     * @param name (optional) 
      * @param pageNumber (optional) 
      * @param pageSize (optional) 
      * @param sortCriteria (optional) 
      * @param filters (optional) 
      * @return OK
      */
-    getPagedListProduct(pageNumber: number | undefined, pageSize: number | undefined, sortCriteria: ProductDtoSortCriterion[] | undefined, filters: ProductDtoFilterCriterion[] | undefined, cancelToken?: CancelToken): Promise<ProductDtoPagedResponse> {
+    getPagedListProduct(name: string | undefined, pageNumber: number | undefined, pageSize: number | undefined, sortCriteria: ProductDtoSortCriterion[] | undefined, filters: ProductDtoFilterCriterion[] | undefined, cancelToken?: CancelToken): Promise<ProductDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/v1/Product/GetPagedListProduct?";
+        if (name === null)
+            throw new Error("The parameter 'name' cannot be null.");
+        else if (name !== undefined)
+            url_ += "Name=" + encodeURIComponent("" + name) + "&";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
