@@ -12,7 +12,6 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
-import { ScrollArea } from "../ui/scroll-area";
 
 interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -49,7 +48,7 @@ export function DataTable<TData>({
       <div className="flex-grow overflow-hidden rounded-md border">
         <div className="h-full overflow-auto">
           <Table>
-            <TableHeader>
+            <TableHeader className="sticky top-0 z-10 w-full">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -71,6 +70,7 @@ export function DataTable<TData>({
                 </TableRow>
               ))}
             </TableHeader>
+
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
