@@ -25,8 +25,10 @@ export default async function DashboardLayout({
       <SidebarProvider defaultOpen={defaultOpen}>
         <AppSidebar />
         <SidebarInset>
-          <Header />
-          {children}
+          <div className="flex h-screen flex-col">
+            <Header />
+            <div className="flex-grow overflow-auto">{children}</div>
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </KBar>

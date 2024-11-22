@@ -36,7 +36,7 @@ export default async function IndexPage(props: IndexPageProps) {
   });
 
   return (
-    <Shell>
+    <div className="grid h-full gap-4 overflow-hidden px-6 py-4">
       <Heading
         title={`Products`}
         description="Manage your products to keep track of your inventory."
@@ -53,21 +53,23 @@ export default async function IndexPage(props: IndexPageProps) {
         />
       </React.Suspense>
 
-      <React.Suspense
-        fallback={
-          <DataTableSkeleton
-            columnCount={6}
-            searchableColumnCount={1}
-            filterableColumnCount={2}
-            cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
-            shrinkZero
-          />
-        }
-      >
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <ProductTable />
-        </HydrationBoundary>
-      </React.Suspense>
-    </Shell>
+      <div className="min-w-0 flex-grow overflow-auto">
+        <React.Suspense
+          fallback={
+            <DataTableSkeleton
+              columnCount={6}
+              searchableColumnCount={1}
+              filterableColumnCount={2}
+              cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
+              shrinkZero
+            />
+          }
+        >
+          <HydrationBoundary state={dehydrate(queryClient)}>
+            <ProductTable />
+          </HydrationBoundary>
+        </React.Suspense>
+      </div>
+    </div>
   );
 }
