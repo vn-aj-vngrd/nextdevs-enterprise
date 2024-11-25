@@ -34,8 +34,8 @@ export default async function IndexPage(props: IndexPageProps) {
     queryFn: () =>
       client.getPagedListProduct(
         search.name,
-        search.pageNumber,
-        search.pageSize,
+        search.pageNumber ?? 1,
+        search.pageSize ?? 10,
         undefined,
         undefined
       )
