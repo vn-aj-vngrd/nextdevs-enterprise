@@ -177,12 +177,12 @@ export function useDataTable<TData>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(initialState?.columnVisibility ?? {});
 
-  const [page, setPage] = useQueryState(
-    "page",
+  const [pageNumber, setPageNumber] = useQueryState(
+    "pageNumber",
     parseAsInteger.withOptions(queryStateOptions).withDefault(1)
   );
-  const [perPage, setPerPage] = useQueryState(
-    "perPage",
+  const [pageSize, setPageSize] = useQueryState(
+    "pageSize",
     parseAsInteger
       .withOptions(queryStateOptions)
       .withDefault(initialState?.pagination?.pageSize ?? 10)
@@ -221,18 +221,18 @@ export function useDataTable<TData>({
 
   // Paginate
   const pagination: PaginationState = {
-    pageIndex: page - 1, // zero-based index -> one-based index
-    pageSize: perPage
+    pageIndex: pageNumber - 1, // zero-based index -> one-based index
+    pageSize: pageSize
   };
 
   function onPaginationChange(updaterOrValue: Updater<PaginationState>) {
     if (typeof updaterOrValue === "function") {
       const newPagination = updaterOrValue(pagination);
-      void setPage(newPagination.pageIndex + 1);
-      void setPerPage(newPagination.pageSize);
+      void setPageNumber(newPagination.pageIndex + 1);
+      void setPageSize(newPagination.pageSize);
     } else {
-      void setPage(updaterOrValue.pageIndex + 1);
-      void setPerPage(updaterOrValue.pageSize);
+      void setPageNumber(updaterOrValue.pageIndex + 1);
+      void setPageSize(updaterOrValue.pageSize);
     }
   }
 
@@ -305,7 +305,7 @@ export function useDataTable<TData>({
           }
         });
 
-        void setPage(1);
+        void setPageNumber(1);
 
         debouncedSetFilterValues(filterUpdates);
         return next;
@@ -316,7 +316,7 @@ export function useDataTable<TData>({
       enableAdvancedFilter,
       filterableColumns,
       searchableColumns,
-      setPage
+      setPageNumber
     ]
   );
 
