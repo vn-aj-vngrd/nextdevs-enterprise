@@ -24,7 +24,7 @@ public class ProductRepository(ApplicationDbContext dbContext)
     {
         // Start with the base query
         var query = dbContext.Products.AsQueryable();
-        
+
         // Apply name filter
         if (!string.IsNullOrWhiteSpace(name))
             query = query.Where(p => p.Name.Contains(name));
@@ -50,23 +50,35 @@ public class ProductRepository(ApplicationDbContext dbContext)
         IQueryable<T> query,
         List<SortCriterion<TDto>> sortCriteria)
     {
+        if (sortCriteria == null || !sortCriteria.Any())
+            return query;
+
         IOrderedQueryable<T> orderedQuery = null;
 
         for (var i = 0; i < sortCriteria.Count; i++)
         {
             var criterion = sortCriteria[i];
-            var parameter = Expression.Parameter(typeof(T), "x");
-            var property = Expression.Convert(Expression.Invoke(criterion.PropertySelector, parameter), typeof(object));
-            var lambda = Expression.Lambda<Func<T, object>>(property, parameter);
 
+            // Validate the property exists on T
+            var property = typeof(T).GetProperty(criterion.PropertyName);
+            if (property == null)
+                throw new ArgumentException(
+                    $"Property '{criterion.PropertyName}' does not exist on type '{typeof(T).Name}'.");
+
+            // Create parameter for lambda expression (e.g., "x => x.PropertyName")
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var propertyAccess = Expression.Property(parameter, criterion.PropertyName);
+            var lambda = Expression.Lambda(propertyAccess, parameter);
+
+            // Apply sorting
             if (i == 0)
                 orderedQuery = criterion.Desc
-                    ? query.OrderByDescending(lambda)
-                    : query.OrderBy(lambda);
+                    ? Queryable.OrderByDescending(query, (dynamic)lambda)
+                    : Queryable.OrderBy(query, (dynamic)lambda);
             else
                 orderedQuery = criterion.Desc
-                    ? orderedQuery.ThenByDescending(lambda)
-                    : orderedQuery.ThenBy(lambda);
+                    ? Queryable.ThenByDescending(orderedQuery, (dynamic)lambda)
+                    : Queryable.ThenBy(orderedQuery, (dynamic)lambda);
         }
 
         return orderedQuery ?? query;

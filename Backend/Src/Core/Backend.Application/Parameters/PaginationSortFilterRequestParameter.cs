@@ -9,21 +9,21 @@ public class PaginationSortFilterRequestParameter<TDto>
     public PaginationSortFilterRequestParameter()
     {
         PageNumber = 1;
-        PageSize = 20;
+        PageSize = 10;
         SortCriteria = new List<SortCriterion<TDto>>();
-        Filters = new List<FilterCriterion<TDto>>();
+        FilterCriteria = new List<FilterCriterion<TDto>>();
     }
 
     public PaginationSortFilterRequestParameter(
         int pageNumber,
         int pageSize,
         List<SortCriterion<TDto>> sortCriteria,
-        List<FilterCriterion<TDto>> filters)
+        List<FilterCriterion<TDto>> filterCriteria)
     {
         PageNumber = pageNumber < 1 ? 1 : pageNumber;
         PageSize = pageSize;
         SortCriteria = sortCriteria ?? new List<SortCriterion<TDto>>();
-        Filters = filters ?? new List<FilterCriterion<TDto>>();
+        FilterCriteria = filterCriteria ?? new List<FilterCriterion<TDto>>();
     }
 
     // Pagination properties
@@ -34,38 +34,61 @@ public class PaginationSortFilterRequestParameter<TDto>
     public List<SortCriterion<TDto>> SortCriteria { get; set; }
 
     // Filtering properties
-    public List<FilterCriterion<TDto>> Filters { get; set; }
+    public List<FilterCriterion<TDto>> FilterCriteria { get; set; }
 }
 
-// Sort criterion with a property selector
+// Sort criterion with a string property name
 public class SortCriterion<TDto>
 {
-    public Expression<Func<TDto, object>> PropertySelector { get; set; }
+    private string _propertyName;
+
+    public string PropertyName
+    {
+        get => _propertyName;
+        set
+        {
+            ValidatePropertyName(value);
+            _propertyName = value;
+        }
+    }
+
     public bool Desc { get; set; } // True for descending, false for ascending
+
+    private static void ValidatePropertyName(string propertyName)
+    {
+        if (typeof(TDto).GetProperty(propertyName) == null)
+            throw new ArgumentException($"Property '{propertyName}' does not exist on type '{typeof(TDto).Name}'.");
+    }
 }
 
-// Filter criterion with a property selector and value
+// Filter criterion with a string property name
 public class FilterCriterion<TDto>
 {
-    public Expression<Func<TDto, object>> PropertySelector { get; set; }
+    private string _propertyName;
+
+    public string PropertyName
+    {
+        get => _propertyName;
+        set
+        {
+            ValidatePropertyName(value);
+            _propertyName = value;
+        }
+    }
+
     public FilterOperation Operation { get; set; }
     public object Value { get; set; }
 
     public Expression<Func<TEntity, bool>> ToExpression<TEntity>()
     {
-        // Get the property name from the PropertySelector
-        var propertyName = ((MemberExpression)PropertySelector.Body).Member.Name;
-
-        // Create the parameter for the lambda (e.g., "x" in x => x.Property)
-        var parameter = Expression.Parameter(typeof(TEntity), "x");
-
         // Get the property to filter on (e.g., x.Property)
-        var property = Expression.Property(parameter, propertyName);
+        var parameter = Expression.Parameter(typeof(TEntity), "x");
+        var property = Expression.Property(parameter, PropertyName);
 
-        // Create the value to compare (e.g., "Value" in x.Property == Value)
+        // Create the value to compare
         var constant = Expression.Constant(Value);
 
-        // Build the operation (e.g., ==, >, <, Contains)
+        // Build the operation
         Expression comparison = Operation switch
         {
             FilterOperation.Equals => Expression.Equal(property, constant),
@@ -83,6 +106,12 @@ public class FilterCriterion<TDto>
 
         // Build and return the complete lambda expression
         return Expression.Lambda<Func<TEntity, bool>>(comparison, parameter);
+    }
+
+    private static void ValidatePropertyName(string propertyName)
+    {
+        if (typeof(TDto).GetProperty(propertyName) == null)
+            throw new ArgumentException($"Property '{propertyName}' does not exist on type '{typeof(TDto).Name}'.");
     }
 }
 

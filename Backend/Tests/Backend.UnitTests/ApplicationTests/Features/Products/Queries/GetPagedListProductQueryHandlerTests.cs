@@ -14,21 +14,22 @@ public class GetPagedListProductQueryHandlerTests
     public async Task Handle_ReturnsPagedListResponse()
     {
         // Arrange
+        var name = "Test";
         var pageNumber = 1;
         var pageSize = 10;
         var sortCriteria = new List<SortCriterion<ProductDto>>
         {
             new()
             {
-                PropertySelector = dto => dto.Name,
+                PropertyName = "Name",
                 Desc = false
             }
         };
-        var filters = new List<FilterCriterion<ProductDto>>
+        var filterCriteria = new List<FilterCriterion<ProductDto>>
         {
             new()
             {
-                PropertySelector = dto => dto.Price,
+                PropertyName = "Price",
                 Operation = FilterOperation.GreaterThan,
                 Value = "1000"
             }
@@ -42,17 +43,19 @@ public class GetPagedListProductQueryHandlerTests
         };
 
         var productRepositoryMock = new Mock<IProductRepository>();
-        productRepositoryMock.Setup(repo => repo.GetPagedListAsync(pageNumber, pageSize, sortCriteria, filters))
+        productRepositoryMock.Setup(repo =>
+                repo.GetPagedListAsync(name, pageNumber, pageSize, sortCriteria, filterCriteria))
             .ReturnsAsync(new PaginationResponseDto<ProductDto>(products, 100, pageNumber, pageSize));
 
         var handler = new GetPagedListProductQueryHandler(productRepositoryMock.Object);
 
         var query = new GetPagedListProductQuery
         {
+            Name = name,
             PageNumber = pageNumber,
             PageSize = pageSize,
             SortCriteria = sortCriteria,
-            Filters = filters
+            FilterCriteria = filterCriteria
         };
 
         // Act
