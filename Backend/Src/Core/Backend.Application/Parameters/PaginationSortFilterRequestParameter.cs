@@ -9,7 +9,7 @@ public class PaginationSortFilterRequestParameter<TDto>
     public PaginationSortFilterRequestParameter()
     {
         PageNumber = 1;
-        PageSize = 10;
+        PageSize = 20;
         SortCriteria = new List<SortCriterion<TDto>>();
         FilterCriteria = new List<FilterCriterion<TDto>>();
     }
