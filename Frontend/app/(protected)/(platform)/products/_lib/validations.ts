@@ -30,7 +30,7 @@ export const searchParamsCache = createSearchParamsCache({
   ]),
 
   // advanced filter
-  filters: getFiltersStateParser().withDefault([]),
+  filterCriteria: getFiltersStateParser().withDefault([]),
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and")
 });
 

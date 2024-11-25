@@ -28,7 +28,7 @@ interface ProductTableProps {
   pageNumber?: number;
   pageSize?: number;
   sortCriteria: ProductDtoSortCriterion[];
-  filters: ProductDtoFilterCriterion[];
+  filterCriteria: ProductDtoFilterCriterion[];
 }
 
 export function ProductTable({
@@ -36,10 +36,17 @@ export function ProductTable({
   pageNumber,
   pageSize,
   sortCriteria,
-  filters
+  filterCriteria
 }: ProductTableProps) {
   const { data } = useQuery({
-    queryKey: ["products", name, pageNumber, pageSize, sortCriteria, filters],
+    queryKey: [
+      "products",
+      name,
+      pageNumber,
+      pageSize,
+      sortCriteria,
+      filterCriteria
+    ],
     queryFn: () =>
       client.getPagedListProduct(
         name,

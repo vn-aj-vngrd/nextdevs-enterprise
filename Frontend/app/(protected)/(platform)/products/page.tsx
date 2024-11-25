@@ -25,13 +25,20 @@ interface IndexPageProps {
 export default async function IndexPage(props: IndexPageProps) {
   const queryClient = new QueryClient();
   const searchParams = await props.searchParams;
-  const { name, pageNumber, pageSize, sortCriteria, filters } =
+  const { name, pageNumber, pageSize, sortCriteria, filterCriteria } =
     searchParamsCache.parse(searchParams);
 
-  const validFilters = getValidFilters(filters);
+  const validFilters = getValidFilters(filterCriteria);
 
   await queryClient.prefetchQuery({
-    queryKey: ["products", name, pageNumber, pageSize, sortCriteria, filters],
+    queryKey: [
+      "products",
+      name,
+      pageNumber,
+      pageSize,
+      sortCriteria,
+      filterCriteria
+    ],
     queryFn: () =>
       client.getPagedListProduct(
         name,
@@ -78,7 +85,7 @@ export default async function IndexPage(props: IndexPageProps) {
               pageNumber={pageNumber}
               pageSize={pageSize}
               sortCriteria={sortCriteria}
-              filters={validFilters}
+              filterCriteria={validFilters}
             />
           </HydrationBoundary>
         </React.Suspense>
