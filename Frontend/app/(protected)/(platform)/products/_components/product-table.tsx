@@ -39,7 +39,7 @@ export function ProductTable({
   filters
 }: ProductTableProps) {
   const { data } = useQuery({
-    queryKey: ["products", name],
+    queryKey: ["products", name, pageNumber, pageSize, sortCriteria, filters],
     queryFn: () =>
       client.getPagedListProduct(
         name,
@@ -94,7 +94,7 @@ export function ProductTable({
   const { table } = useDataTable({
     data: data?.data ?? [],
     columns,
-    pageCount: data?.totalItems ?? 0,
+    pageCount: data?.totalPages ?? 0,
     filterFields,
     enableAdvancedFilter: enableAdvancedTable,
     initialState: {
