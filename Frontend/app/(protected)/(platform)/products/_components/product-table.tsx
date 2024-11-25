@@ -43,8 +43,8 @@ export function ProductTable({
     queryFn: () =>
       client.getPagedListProduct(
         name,
-        pageNumber ?? 1,
-        pageSize ?? 10,
+        pageNumber,
+        pageSize,
         undefined,
         undefined
       )
